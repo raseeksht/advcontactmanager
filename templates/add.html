@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block title %} {{title}} {% endblock %}
+
+{% block body %}
+<div class="ajax"></div>
+<div class="container">
+<form action="" method="get" accept-charset="utf-8">
+  {% csrf_token %}
+  <div class="input-group flex-nowrap mt-3">
+  <span class="input-group-text" id="addon-wrapping"><i class="fas fa-user-ninja"></i></span>
+  <input type="text" class="form-control name" placeholder="Name" name="name" aria-label="name" aria-describedby="addon-wrapping">
+</div>
+<div class="input-group flex-nowrap mt-2">
+  <span class="input-group-text" id="addon-wrapping"><i class="fas fa-mobile"> </i> &nbsp;</span>
+  <input type="text" class="form-control number" placeholder="number" name="number" aria-label="number" aria-describedby="addon-wrapping">
+</div>
+<div class="input-group flex-nowrap mt-2">
+  <span class="input-group-text" id="addon-wrapping"><i class="fas fa-map-marker-alt"></i></span>
+  <input type="text" class="form-control address" placeholder="address" list="addr" name="address" aria-label="address" aria-describedby="addon-wrapping">
+</div>
+  <datalist id="addr">
+    {% for each in address %}
+    <option value="{{each}}">
+    {% endfor %}
+  </datalist>
+  <input type="submit" class="btn btn-primary mt-3"  value="Add" name="submit">
+  
+</form>
+</div>
+
+{% endblock %}
+
+{% block script%}
+<script>
+  $("input[type=submit]").click(function(e){
+    e.preventDefault()
+    
+    name = $("input[name=name]").val()
+    number = $("input[name=number]").val()
+    address = $("input[name=address]").val()
+    
+    $.post("/adddata/",
+    {
+      name:name,
+      number:number,
+      address:address,
+      csrfmiddlewaretoken:$("input[name=csrfmiddlewaretoken]").val()
+    },
+    function(data){
+      $(".ajax").html(data)
+    })
+  })
+</script>
+
+{% endblock %}

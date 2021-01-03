@@ -1,0 +1,53 @@
+{% extends  "layout.html" %}
+{% block title %} thetitle {% endblock %}
+
+{% block body %}
+<h1>conts</h1>
+
+filterByAddress:
+<select class="filterbyaddress" onchange="getfiltered()">
+  <option disabled selected="">address</option>
+  {% for each in address %}
+  <option value="{{each}}">{{each}}</option>
+  {% endfor %}
+</select>
+{% csrf_token %}
+<div class="tableforcontacts">
+<table class="table table-striped overflow-hidden">
+  <tr>
+    <td>name</td>
+    <td>number</td>
+    <td>location</td>
+  </tr>
+  
+{% for each in contacts %}
+<tr>
+  
+  <td>{{each.name}}</td>
+  <td>{{each.number}}</td>
+  <td>{{each.address}}</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+const csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val()
+
+  function getfiltered(){
+    const address = $('.filterbyaddress').val()
+    
+    $.post("/filter/",
+    {
+      address:address,
+      csrfmiddlewaretoken:csrfmiddlewaretoken
+    },
+    function(data){
+      $(".tableforcontacts").html(data)
+    })
+  }
+ 
+</script>
+{% endblock %}
