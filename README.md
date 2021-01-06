@@ -17,5 +17,10 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-##Author
+## Usage
+```bash
+python manage.py runserver
+```
+
+## Author
 Raseek Shrestha
