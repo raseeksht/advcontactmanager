@@ -13,8 +13,9 @@ filterByAddress:
 </select>
 {% csrf_token %}
 <div class="tableforcontacts">
-<table class="table table-striped overflow-hidden">
+<table class="table table-striped" style="overflow-x:scroll!important;">
   <tr>
+    <td>sn</td>
     <td>name</td>
     <td>number</td>
     <td>location</td>
@@ -22,14 +23,43 @@ filterByAddress:
   
 {% for each in contacts %}
 <tr>
-  
-  <td>{{each.name}}</td>
+  <td>{{each.id}}</td>
+  <td><button type="button" class="btn btn-primary contactNameBtn" onclick="needForEdit({{each.id}},'{{each.name}}','{{each.number}}','{{each.address}}')" data-bs-toggle="modal" data-bs-target="#editor">{{each.name}}</button></td>
   <td>{{each.number}}</td>
   <td>{{each.address}}</td>
 </tr>
 {% endfor %}
 </table>
+
+
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="editor" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Name Goes here</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        if you see this message,either server or your network is slow..
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="deleteContact()" data-bs-dismiss="modal">Delete <i class="fas fa-trash-alt"></i></button>
+        <button type="button" onclick="editContact()" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
 </div>
+
+
+
+
+
 {% endblock %}
 
 {% block script %}
@@ -48,6 +78,49 @@ const csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val()
       $(".tableforcontacts").html(data)
     })
   }
+  function editContact(){
+    const sn = $(".sn").val()
+    const name = $(".name").val()
+    const number = $(".number").val()
+    const address = $(".address").val()
+    $.post("/editcontact/",
+    {
+      sn:sn,
+      name:name,
+      number:number,
+      address:address,
+      csrfmiddlewaretoken:csrfmiddlewaretoken
+    },
+    function(data){
+      alert(data)
+    })
+  }
+  
+  function needForEdit(id,name,number,address){
+    $(".modal-body").html("<input type='hidden' placeholder='id' class='sn' value='"+id+"'><input type='text' class='name' placeholder='name' value='"+name+"'><input type='text' class='number' placeholder='number' value='"+number+"'><input class='address' type='text' placeholder='address' value='"+address+"'>")
+  }
+  function deleteContact(){
+    const sn = $(".sn").val()
+    const name = $(".name").val()
+    const number = $(".number").val()
+    const address = $(".address").val()
+    if (confirm("delete "+name+ " from contact")){
+
+    $.post("/deletecontact/",
+    {
+      sn:sn,
+      name:name,
+      number:number,
+      address:address,
+      csrfmiddlewaretoken:csrfmiddlewaretoken
+    },
+    function(data){
+      alert(data)
+    })
+    }
+    
+  }
+ 
  
 </script>
 {% endblock %}

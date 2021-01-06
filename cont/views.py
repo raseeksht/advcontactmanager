@@ -1,6 +1,7 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from contacts.models import Contact
+from django.contrib.auth import authenticate,login
 
 def getContacts():
   return Contact.objects.all()
@@ -14,19 +15,36 @@ def getAddress():
   return address
 
 def index(request):
-  return HttpResponse("login page ho yo")
+  if request.method == "POST":
+    username = request.POST["username"]
+    password = request.POST["password"]
+    user = authenticate(username=username,password=password)
+    if user is not None:
+      login(request,user)
+      return redirect("/lists/")
+    else:
+      return HttpResponse("incorrect email or password")
+    return HttpResponse(f"<h1>we got post request here</h1>username: {username}<br>password: {password}")
+  return render(request,"index.html")
   
 def lists(request):
-  values = {"contacts":getContacts(),"address":getAddress(),"list_active":"active"}
-  return render(request,"lists.html",values)
-
+  print(request.user.is_authenticated)
+  if request.user.is_authenticated:
+    values = {"contacts":getContacts(),"address":getAddress(),"list_active":"active"}
+    return render(request,"lists.html",values)
+  else:
+    #return HttpResponse("/")
+    return redirect("/")
+    
 def add(request):
-  values = {"title":"Add Contacts","address":getAddress(),"add_active":"active"}
-  return render(request,"add.html",values)
-  
+  if request.user.is_authenticated:
+    values = {"title":"Add Contacts","address":getAddress(),"add_active":"active"}
+    return render(request,"add.html",values)
+  else:
+    return redirect("/")
 
 def filter(request):
-  if request.method == "POST":
+  if request.method == "POST" and request.user.is_authenticated:
     addr= request.POST["address"]
     res = Contact.objects.filter(address=addr)
     string = """
@@ -46,7 +64,9 @@ def filter(request):
       </tr>"""
     string += """</table>"""
     return HttpResponse(string)
-  return HttpResponse("ok here we are")
+  elif request.method == "GET":
+    return redirect("/")
+  return HttpResponse("make sure that you are valid user")
 
 
 def alert(msg):
@@ -67,9 +87,39 @@ def addData(request):
 
 
 
+def needForEdit(request):
+  if request.method == "POST" and request.user.is_authenticated:
+    return HttpResponse("okay you are good to go")
+  else:
+    return HttpResponse("this is either get request or you are not a valid user")
 
+def editContact(request):
+  if request.method == "POST" and request.user.is_authenticated:
+    sn = request.POST["sn"]
+    name = request.POST["name"]
+    number = request.POST["number"]
+    address = request.POST["address"]
+    editCont = Contact.objects.get(id=sn)
+    editCont.name = name
+    editCont.number = number
+    editCont.address = address
+    editCont.save()
+    print("saved")
+    return HttpResponse(name+str(sn)+" received")
 
-
-
-
-
+def deleteContact(request):
+  if request.method=="POST" and request.user.is_authenticated:
+    sn,name,number,address = getContactDetailsFromRequest(request)
+    try:
+      getInfo = Contact.objects.get(id=sn,name=name,number=number,address=address)
+    except Exception:
+      return HttpResponse("do not edit if you want to delete..")
+    getInfo.delete()
+    return HttpResponse("done")
+    
+def getContactDetailsFromRequest(request):
+  sn = request.POST["sn"]
+  name = request.POST["name"]
+  number = request.POST["number"]
+  address = request.POST["address"]
+  return sn,name,number,address

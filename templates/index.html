@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %} Login {% endblock %}
+{% block css %}
+<style>
+  .make-relative{
+    position: relative;
+  }
+  .login-form{
+    width: 90%;
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+  }
+</style>
+
+{% endblock %}
+{% block body %}
+
+<div class="container make-relative">
+  
+  <div class="p-3 login-form bg-secondary">
+    <form method="post">
+      {% csrf_token %}
+      
+      <div class="input-group flex-nowrap">
+        <span class="input-group-text" id="addon-wrapping">@</span>
+        <input type="text" class="form-control" placeholder="Username" name="username" aria-label="Username" aria-describedby="addon-wrapping">
+      </div>
+      <div class="input-group mt-3 flex-nowrap">
+        <span class="input-group-text" id="">@</span>
+        <input type="password" class="form-control" placeholder="Password" name="password" aria-label="Password" aria-describedby="addon-wrapping">
+      </div>
+      <button type="submit" class="btn mt-2 btn-primary">Login</button> 
+      
+      
+      
+    </form>
+  </div>
+</div>
+{% endblock %}
+

@@ -25,5 +25,8 @@ urlpatterns = [
     path('add/',views.add,name='AddPage'),
     path('filter/',views.filter,name='forajaxPage'),
     path('adddata/',views.addData,name='forajaxPage adding data'),
+    path('needforedit/',views.needForEdit,name='get name,number,address for edit useless delete later '),
+    path('editcontact/',views.editContact,name='edit existing contact info'),
+    path('deletecontact/',views.deleteContact,name='delete existing contact info'),
     
 ]
