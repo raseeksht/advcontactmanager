@@ -25,7 +25,8 @@ def index(request):
     else:
       return HttpResponse("incorrect email or password")
     return HttpResponse(f"<h1>we got post request here</h1>username: {username}<br>password: {password}")
-  return render(request,"index.html")
+  values = {"nonav":True}
+  return render(request,"index.html",values)
   
 def lists(request):
   print(request.user.is_authenticated)
